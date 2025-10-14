@@ -15,7 +15,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User, LogOut } from "lucide-react";
 
-export function UserProfile() {
+export default function UserProfile() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
@@ -25,7 +25,7 @@ export function UserProfile() {
 
   if (!session) {
     return (
-      <div className="flex flex-col items-center gap-4 p-6">
+      <div className="flex flex-col items-center gap-4 p-6" role="region" aria-label="Authentication required">
         <SignInButton />
       </div>
     );
@@ -40,7 +40,12 @@ export function UserProfile() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="size-8 cursor-pointer hover:opacity-80 transition-opacity">
+        <Avatar
+          className="size-8 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          aria-label={`User menu for ${session.user?.name || session.user?.email || 'User'}`}
+          aria-haspopup="menu"
+          aria-expanded="false"
+        >
           <AvatarImage
             src={session.user?.image || ""}
             alt={session.user?.name || "User"}
@@ -55,8 +60,8 @@ export function UserProfile() {
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="font-normal">
+      <DropdownMenuContent align="end" className="w-56" role="menu" aria-label="User account menu">
+        <DropdownMenuLabel className="font-normal" role="none">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
               {session.user?.name}
@@ -67,15 +72,15 @@ export function UserProfile() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/profile" className="flex items-center">
-            <User className="mr-2 h-4 w-4" />
+        <DropdownMenuItem asChild role="menuitem">
+          <Link href="/profile" className="flex items-center focus:outline-none focus:bg-accent">
+            <User className="mr-2 h-4 w-4" aria-hidden="true" />
             Your Profile
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut} variant="destructive">
-          <LogOut className="mr-2 h-4 w-4" />
+        <DropdownMenuItem onClick={handleSignOut} variant="destructive" role="menuitem">
+          <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
           Log out
         </DropdownMenuItem>
       </DropdownMenuContent>

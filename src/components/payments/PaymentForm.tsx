@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CommissionCalculator } from "@/lib/commission-calculator";
 import { useTranslation, Language } from "@/lib/translations";
+import { HealthcareToast } from "@/lib/toast";
 
 interface PaymentFormProps {
   amount: number;
@@ -59,8 +60,15 @@ export function PaymentForm({ amount, transactionId, onPaymentInitiate, onPaymen
       };
 
       await onPaymentInitiate(paymentData);
+      HealthcareToast.success("Payment initiated successfully", {
+        description: `Payment of $${amount.toFixed(2)} has been initiated.`
+      });
     } catch (error) {
       console.error("Payment initiation failed:", error);
+      HealthcareToast.paymentError(`$${amount.toFixed(2)}`, {
+        transactionId,
+        operation: 'initiate'
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -76,8 +84,15 @@ export function PaymentForm({ amount, transactionId, onPaymentInitiate, onPaymen
       };
 
       await onPaymentProcess(paymentData);
+      HealthcareToast.success("Payment processed successfully", {
+        description: `Payment of $${amount.toFixed(2)} has been completed.`
+      });
     } catch (error) {
       console.error("Payment processing failed:", error);
+      HealthcareToast.paymentError(`$${amount.toFixed(2)}`, {
+        transactionId,
+        operation: 'process'
+      });
     } finally {
       setIsProcessing(false);
     }

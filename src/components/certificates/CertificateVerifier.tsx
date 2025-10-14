@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { CheckCircle, XCircle, Clock, QrCode, Search } from 'lucide-react';
 import Image from 'next/image';
+import { HealthcareToast } from '@/lib/toast';
 
 interface VerificationResult {
   certificateNumber: string;
@@ -48,7 +49,7 @@ export function CertificateVerifier() {
 
   const handleVerify = async () => {
     if (!certificateNumber.trim() && !qrData.trim()) {
-      setError('Please enter a certificate number or scan a QR code');
+      HealthcareToast.validationError(['certificate number or QR code']);
       return;
     }
 
@@ -65,9 +66,23 @@ export function CertificateVerifier() {
 
       const result = await response.json();
       setVerificationResult(result.data);
+
+      if (result.data.isValid) {
+        HealthcareToast.success("Certificate verified successfully", {
+          description: `Certificate ${result.data.certificateNumber} is valid and authentic.`
+        });
+      } else {
+        HealthcareToast.certificateError('verify', {
+          certificateId: result.data.certificateNumber
+        });
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Verification failed');
+      const errorMessage = err instanceof Error ? err.message : 'Verification failed';
+      setError(errorMessage);
       setVerificationResult(null);
+      HealthcareToast.certificateError('verify', {
+        certificateId: certificateNumber || qrData
+      });
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,8 @@ import { Geist, Geist_Mono, Noto_Sans_Arabic } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { Toaster } from "@/components/ui/sonner";
+import { ErrorBoundary } from "@/components/error-boundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,9 +45,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SiteHeader />
-          {children}
-          <SiteFooter />
+          <ErrorBoundary>
+            <SiteHeader />
+            <main id="main-content" tabIndex={-1}>
+              {children}
+            </main>
+            <SiteFooter />
+          </ErrorBoundary>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
