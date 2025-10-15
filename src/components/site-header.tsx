@@ -14,12 +14,12 @@ import { useRouter } from "next/navigation";
 import { motion, PanInfo } from "framer-motion";
 import { getSession } from "@/lib/auth-client";
 
-const UserProfile = dynamic(() => import("@/components/auth/user-profile"), { ssr: false });
+const DynamicUserProfile = dynamic(() => import("@/components/auth/user-profile"), { ssr: false });
 
 export function SiteHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [session, setSession] = useState(null);
+  const [session, setSession] = useState<any>(null);
   const { role } = useUserRole();
   const router = useRouter();
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -169,7 +169,7 @@ export function SiteHeader() {
           </Link>
         </nav>
         <div className="flex items-center gap-4">
-          <UserProfile />
+          <DynamicUserProfile />
           <ModeToggle />
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>

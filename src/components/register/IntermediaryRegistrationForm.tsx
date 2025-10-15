@@ -54,7 +54,31 @@ export function IntermediaryRegistrationForm() {
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: formData,
+    defaultValues: {
+      companyName: "",
+      registrationNumber: "",
+      taxId: "",
+      contactEmail: "",
+      contactPhone: "",
+      address: {
+        street: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: "",
+      },
+      licenseNumber: "",
+      licenseType: "",
+      issuingAuthority: "",
+      expiryDate: "",
+      coverageTypes: [],
+      maxCoverageAmount: "",
+      guarantorName: "",
+      guarantorEmail: "",
+      guarantorPhone: "",
+      guaranteeAmount: "",
+      ...formData,
+    },
   })
 
   const onSubmit = async (data: any) => {

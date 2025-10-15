@@ -2,7 +2,7 @@
 
 import { useSession } from "@/lib/auth-client";
 import { useUserRole } from "@/hooks/use-user-role";
-import { UserProfile } from "@/components/auth/user-profile";
+import UserProfile from "@/components/auth/user-profile";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -11,6 +11,10 @@ import { InsuranceDashboard } from "@/components/dashboard/InsuranceDashboard";
 import { IntermediaryDashboard } from "@/components/dashboard/IntermediaryDashboard";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import dynamic from "next/dynamic";
+
+// Dynamically import components that use auth hooks to avoid SSR issues
+const DynamicUserProfile = dynamic(() => import("@/components/auth/user-profile"), { ssr: false });
 
 export default function DashboardPage() {
   const { data: session, isPending } = useSession();
@@ -43,7 +47,7 @@ export default function DashboardPage() {
               You need to sign in to access the dashboard
             </p>
           </div>
-          <UserProfile />
+          <DynamicUserProfile />
         </div>
       </div>
     );

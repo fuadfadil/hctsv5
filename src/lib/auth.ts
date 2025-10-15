@@ -65,5 +65,10 @@ export const auth = betterAuth({
       httpOnly: true,
       sameSite: "lax",
     },
+    useSecureCookies: process.env.NODE_ENV === "production",
+  },
+  logger: {
+    level: "debug",
+    disabled: false,
   },
 })

@@ -102,7 +102,32 @@ export function ProviderRegistrationForm() {
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: formData,
+    defaultValues: {
+      organizationName: "",
+      registrationNumber: "",
+      taxId: "",
+      contactEmail: "",
+      contactPhone: "",
+      address: {
+        street: "",
+        city: "",
+        state: "",
+        postalCode: "",
+        country: "",
+      },
+      licenseNumber: "",
+      licenseType: "",
+      issuingAuthority: "",
+      expiryDate: "",
+      guarantorName: "",
+      guarantorEmail: "",
+      guarantorPhone: "",
+      guaranteeAmount: "",
+      icd11Codes: [],
+      specialties: [],
+      serviceDescription: "",
+      ...formData,
+    },
   })
 
   const onSubmit = async (data: any) => {

@@ -37,7 +37,14 @@ export function SignInButton() {
         throw new Error(result.error.message || "Sign-in failed");
       }
 
-      console.log("[SignInButton] Sign-in initiated successfully");
+      if (result?.url) {
+        console.log("[SignInButton] Redirecting to:", result.url);
+        window.location.href = result.url;
+        return;
+      }
+
+      // If no URL is returned, the sign-in might have succeeded directly
+      console.log("[SignInButton] Sign-in completed without redirect");
     } catch (error: any) {
       console.error("[SignInButton] Sign-in error:", error);
 
