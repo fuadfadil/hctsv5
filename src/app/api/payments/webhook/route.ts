@@ -7,7 +7,7 @@ import { createPaymentGateway } from "@/lib/payment-gateway";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { gateway, transactionId, status, gatewayData } = body;
+    const { gateway, transactionId, status, gatewayData, signature } = body;
 
     // Basic validation
     if (!gateway || !transactionId || !status) {
@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
       gateway,
       transactionId,
       status,
+      signature,
       ...gatewayData,
     });
 

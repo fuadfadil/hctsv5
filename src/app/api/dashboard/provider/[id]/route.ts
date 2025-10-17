@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { services, transactions, users, profiles } from "@/lib/schema";
+import { services, transactions, users, profiles, icd11Categories } from "@/lib/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 
 export async function GET(
@@ -62,17 +62,39 @@ export async function GET(
       .select({
         service_id: services.id,
         service_name: services.name,
+        icd11_code: services.icd11_code,
+        icd11_name: icd11Categories.name,
         views: sql<number>`0`, // Placeholder - would need view tracking
         purchases: sql<number>`count(${transactions.id})`,
         rating: sql<number>`0`, // Placeholder - would need rating system
       })
       .from(services)
+      .leftJoin(icd11Categories, eq(services.icd11_code, icd11Categories.code))
       .leftJoin(transactions, and(
         eq(services.id, transactions.service_id),
         eq(transactions.status, "completed")
       ))
       .where(eq(services.provider_id, userId))
-      .groupBy(services.id, services.name);
+      .groupBy(services.id, services.name, services.icd11_code, icd11Categories.name);
+
+    // Get ICD11 category analytics
+    const icd11Analytics = await db
+      .select({
+        icd11_code: services.icd11_code,
+        category_name: icd11Categories.name,
+        service_count: sql<number>`count(distinct ${services.id})`,
+        total_sales: sql<number>`sum(${transactions.total_price})`,
+        transaction_count: sql<number>`count(${transactions.id})`,
+      })
+      .from(services)
+      .leftJoin(icd11Categories, eq(services.icd11_code, icd11Categories.code))
+      .leftJoin(transactions, and(
+        eq(services.id, transactions.service_id),
+        eq(transactions.status, "completed")
+      ))
+      .where(eq(services.provider_id, userId))
+      .groupBy(services.icd11_code, icd11Categories.name)
+      .orderBy(desc(sql<number>`sum(${transactions.total_price})`));
 
     return NextResponse.json({
       activeServices: activeServicesCount[0]?.count || 0,
@@ -81,6 +103,7 @@ export async function GET(
       pendingOrders: pendingOrdersCount[0]?.count || 0,
       recentTransactions,
       serviceMetrics,
+      icd11Analytics,
     });
   } catch (error) {
     console.error("Error fetching provider dashboard data:", error);

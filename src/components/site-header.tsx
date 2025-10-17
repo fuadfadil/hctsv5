@@ -7,7 +7,7 @@ import { ModeToggle } from "./ui/mode-toggle";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
-import { Stethoscope, Menu, Search, Home, ShoppingCart, BarChart3, User, Settings, LogOut } from "lucide-react";
+import { Stethoscope, Menu, Search, Home, ShoppingCart, BarChart3, User, Settings, LogOut, FileText, TrendingUp } from "lucide-react";
 import { useUserRole } from "@/hooks/use-user-role";
 import { signOut } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
@@ -167,6 +167,22 @@ export function SiteHeader() {
           >
             Profile
           </Link>
+          <Link
+            href="/dashboard/certificates"
+            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm px-2 py-1"
+            aria-label="View Certificates"
+          >
+            <FileText className="inline h-4 w-4 mr-1" />
+            View
+          </Link>
+          <Link
+            href="/dashboard"
+            className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm px-2 py-1"
+            aria-label="Access Reports and Analytics"
+          >
+            <TrendingUp className="inline h-4 w-4 mr-1" />
+            Reports
+          </Link>
         </nav>
         <div className="flex items-center gap-4">
           <DynamicUserProfile />
@@ -254,6 +270,24 @@ export function SiteHeader() {
                   >
                     <User className="h-5 w-5" aria-hidden="true" />
                     Profile
+                  </Link>
+                  <Link
+                    href="/dashboard/certificates"
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${touchTargetClasses}`}
+                    aria-label="View Certificates"
+                  >
+                    <FileText className="h-5 w-5" aria-hidden="true" />
+                    View Certificates
+                  </Link>
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-3 rounded-md hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${touchTargetClasses}`}
+                    aria-label="Access Reports and Analytics"
+                  >
+                    <TrendingUp className="h-5 w-5" aria-hidden="true" />
+                    Reports & Analytics
                   </Link>
                 </nav>
 

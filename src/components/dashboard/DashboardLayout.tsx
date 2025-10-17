@@ -19,7 +19,8 @@ import {
   ShoppingCart,
   Receipt,
   DollarSign,
-  Activity
+  Activity,
+  Eye
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -34,6 +35,7 @@ const providerMenuItems = [
   { href: "/dashboard/provider/services", label: "Services", icon: Package },
   { href: "/dashboard/provider/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/dashboard/provider/transactions", label: "Transactions", icon: Receipt },
+  { href: "/dashboard/certificates", label: "View Certificates", icon: Eye },
   { href: "/dashboard/provider/profile", label: "Profile", icon: Settings },
 ];
 
@@ -42,6 +44,7 @@ const insuranceMenuItems = [
   { href: "/dashboard/insurance/marketplace", label: "Marketplace", icon: ShoppingCart },
   { href: "/dashboard/insurance/certificates", label: "Certificates", icon: FileText },
   { href: "/dashboard/insurance/analytics", label: "Analytics", icon: TrendingUp },
+  { href: "/dashboard/certificates", label: "View Certificates", icon: Eye },
   { href: "/dashboard/insurance/profile", label: "Profile", icon: Settings },
 ];
 
@@ -51,6 +54,7 @@ const intermediaryMenuItems = [
   { href: "/dashboard/intermediary/transactions", label: "Transactions", icon: Receipt },
   { href: "/dashboard/intermediary/commissions", label: "Commissions", icon: DollarSign },
   { href: "/dashboard/intermediary/clients", label: "Clients", icon: Users },
+  { href: "/dashboard/certificates", label: "View Certificates", icon: Eye },
   { href: "/dashboard/intermediary/profile", label: "Profile", icon: Settings },
 ];
 

@@ -15,7 +15,10 @@ import {
   ShoppingCart as CartIcon,
   Grid,
   List,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Stethoscope,
+  FileText,
+  TrendingUp
 } from "lucide-react";
 
 interface Service {
@@ -23,6 +26,7 @@ interface Service {
   name: string;
   description: string;
   icd11_code: string;
+  icd11_name?: string;
   service_type: "individual" | "package" | "composite";
   base_price: number;
   discount_tiers: any;
@@ -151,13 +155,27 @@ export function ServiceMarketplace() {
             Browse and purchase healthcare services from verified providers
           </p>
         </div>
-        <Button
-          onClick={() => setShowCart(true)}
-          className="flex items-center gap-2"
-        >
-          <CartIcon className="h-4 w-4" />
-          Cart
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setShowCart(true)}
+            className="flex items-center gap-2"
+          >
+            <CartIcon className="h-4 w-4" />
+            Cart
+          </Button>
+          <Button variant="outline" asChild>
+            <a href="/dashboard/certificates">
+              <FileText className="h-4 w-4 mr-2" />
+              View Certificates
+            </a>
+          </Button>
+          <Button variant="outline" asChild>
+            <a href="/dashboard">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Reports
+            </a>
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -174,6 +192,11 @@ export function ServiceMarketplace() {
                   onChange={(e) => handleSearch(e.target.value)}
                   className="pl-9"
                 />
+                {searchTerm && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <Stethoscope className="h-4 w-4 text-blue-500" />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -231,12 +254,18 @@ export function ServiceMarketplace() {
             <div className="mt-4 pt-4 border-t">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">ICD-11 Code</label>
+                  <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                    <Stethoscope className="h-4 w-4" />
+                    ICD-11 Code
+                  </label>
                   <Input
-                    placeholder="e.g., A01, B02.3"
+                    placeholder="e.g., 1A00, 2A01"
                     value={icd11Filter}
                     onChange={(e) => { setIcd11Filter(e.target.value); setCurrentPage(1); }}
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Filter by ICD-11 classification codes
+                  </p>
                 </div>
 
                 <div>

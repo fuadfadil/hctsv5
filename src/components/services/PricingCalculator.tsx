@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, TrendingUp, DollarSign, Percent } from "lucide-react";
+import { Calculator, TrendingUp, DollarSign, Percent, Stethoscope } from "lucide-react";
+import { ICD11Browser } from "@/components/icd11/ICD11Browser";
 
 interface PricingConfig {
   cost: number;
@@ -18,6 +19,16 @@ interface PricingConfig {
     "100+": number;
   };
   competitorPrices?: number[];
+  icd11Code?: string;
+  region?: string;
+}
+
+interface ICD11PricingRule {
+  icd11Code: string;
+  categoryName: string;
+  baseMultiplier: string;
+  complexityFactor: string;
+  riskAdjustment: string;
 }
 
 interface PricingResult {
@@ -27,6 +38,7 @@ interface PricingResult {
   totalRevenue: number;
   profit: number;
   profitMargin: number;
+  appliedPricingRule?: ICD11PricingRule;
 }
 
 export function PricingCalculator() {
@@ -38,7 +50,9 @@ export function PricingCalculator() {
       "50-99": 5,
       "100+": 10
     },
-    competitorPrices: []
+    competitorPrices: [],
+    icd11Code: "",
+    region: "global"
   });
 
   const [quantity, setQuantity] = useState(1);
@@ -62,31 +76,65 @@ export function PricingCalculator() {
     }));
   };
 
-  const calculatePricing = () => {
-    let price = config.basePrice;
+  const calculatePricing = async () => {
+    try {
+      const response = await fetch('/api/services/calculate-price', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cost: config.cost,
+          profitMargin: config.profitMargin,
+          basePrice: config.basePrice,
+          quantity,
+          discountTiers: config.discountTiers,
+          icd11Code: config.icd11Code,
+          region: config.region
+        }),
+      });
 
-    // Apply discounts based on quantity
-    let discountPercentage = 0;
-    if (quantity >= 100) {
-      discountPercentage = config.discountTiers["100+"];
-    } else if (quantity >= 50) {
-      discountPercentage = config.discountTiers["50-99"];
+      const data = await response.json();
+
+      if (data.success) {
+        setResult({
+          basePrice: config.basePrice,
+          discountedPrice: data.data.unitPrice,
+          discountPercentage: data.data.discountApplied,
+          totalRevenue: data.data.totalRevenue,
+          profit: data.data.profit,
+          profitMargin: data.data.profitMargin,
+          appliedPricingRule: data.data.appliedPricingRule
+        });
+      }
+    } catch (error) {
+      console.error('Error calculating pricing:', error);
+      // Fallback to local calculation
+      let price = config.basePrice;
+
+      // Apply discounts based on quantity
+      let discountPercentage = 0;
+      if (quantity >= 100) {
+        discountPercentage = config.discountTiers["100+"];
+      } else if (quantity >= 50) {
+        discountPercentage = config.discountTiers["50-99"];
+      }
+
+      const discountedPrice = price * (1 - discountPercentage / 100);
+      const totalRevenue = discountedPrice * quantity;
+      const totalCost = config.cost * quantity;
+      const profit = totalRevenue - totalCost;
+      const actualProfitMargin = totalCost > 0 ? (profit / totalCost) * 100 : 0;
+
+      setResult({
+        basePrice: price,
+        discountedPrice,
+        discountPercentage,
+        totalRevenue,
+        profit,
+        profitMargin: actualProfitMargin
+      });
     }
-
-    const discountedPrice = price * (1 - discountPercentage / 100);
-    const totalRevenue = discountedPrice * quantity;
-    const totalCost = config.cost * quantity;
-    const profit = totalRevenue - totalCost;
-    const actualProfitMargin = totalCost > 0 ? (profit / totalCost) * 100 : 0;
-
-    setResult({
-      basePrice: price,
-      discountedPrice,
-      discountPercentage,
-      totalRevenue,
-      profit,
-      profitMargin: actualProfitMargin
-    });
   };
 
   const calculateSuggestedPrice = () => {
@@ -232,6 +280,59 @@ export function PricingCalculator() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <Label className="text-base font-medium">ICD11 Classification</Label>
+              <div className="mt-2 space-y-4">
+                <div>
+                  <Label htmlFor="icd11Code">ICD11 Code</Label>
+                  <Input
+                    id="icd11Code"
+                    value={config.icd11Code}
+                    onChange={(e) => updateConfig("icd11Code", e.target.value)}
+                    placeholder="e.g., 1A00, 2A01"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter ICD11 code for dynamic pricing based on medical classification
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="region">Region</Label>
+                  <select
+                    id="region"
+                    value={config.region}
+                    onChange={(e) => updateConfig("region", e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="global">Global</option>
+                    <option value="north-america">North America</option>
+                    <option value="europe">Europe</option>
+                    <option value="asia">Asia</option>
+                    <option value="africa">Africa</option>
+                    <option value="south-america">South America</option>
+                    <option value="oceania">Oceania</option>
+                  </select>
+                </div>
+
+                {result?.appliedPricingRule && (
+                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Stethoscope className="h-4 w-4 text-green-600" />
+                      <span className="text-sm font-medium text-green-800">ICD11 Pricing Applied</span>
+                    </div>
+                    <div className="text-xs text-green-700 space-y-1">
+                      <p><strong>Category:</strong> {result.appliedPricingRule.categoryName}</p>
+                      <p><strong>Base Multiplier:</strong> {result.appliedPricingRule.baseMultiplier}x</p>
+                      <p><strong>Complexity Factor:</strong> {result.appliedPricingRule.complexityFactor}x</p>
+                      <p><strong>Risk Adjustment:</strong> {result.appliedPricingRule.riskAdjustment}x</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

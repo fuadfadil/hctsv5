@@ -16,7 +16,8 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  TrendingUp
 } from 'lucide-react';
 
 interface Certificate {
@@ -146,6 +147,14 @@ export default function CertificatesPage() {
           <p className="text-muted-foreground mt-2">
             View and manage your healthcare service certificates
           </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <a href="/dashboard">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Reports
+            </a>
+          </Button>
         </div>
       </div>
 

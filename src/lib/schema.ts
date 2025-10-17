@@ -102,6 +102,26 @@ export const icd11Categories = pgTable("icd11_categories", {
   index("icd11_categories_parent_id_idx").on(table.parent_id),
 ]);
 
+// ICD11 Pricing Rules table
+export const icd11PricingRules = pgTable("icd11_pricing_rules", {
+  id: serial("id").primaryKey(),
+  icd11_code: varchar("icd11_code", { length: 10 }).notNull(),
+  category_name: text("category_name").notNull(),
+  base_price_multiplier: decimal("base_price_multiplier", { precision: 5, scale: 3 }).notNull().default("1.000"),
+  complexity_factor: decimal("complexity_factor", { precision: 5, scale: 3 }).notNull().default("1.000"),
+  risk_adjustment: decimal("risk_adjustment", { precision: 5, scale: 3 }).notNull().default("1.000"),
+  regional_variation: json("regional_variation"), // Different pricing by region
+  effective_from: timestamp("effective_from").notNull().defaultNow(),
+  effective_to: timestamp("effective_to"),
+  is_active: boolean("is_active").notNull().default(true),
+  created_at: timestamp("created_at").notNull().defaultNow(),
+  updated_at: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  index("icd11_pricing_rules_code_idx").on(table.icd11_code),
+  index("icd11_pricing_rules_active_idx").on(table.is_active),
+  index("icd11_pricing_rules_effective_idx").on(table.effective_from, table.effective_to),
+]);
+
 // Service Components table (for composite services)
 export const serviceComponents = pgTable("service_components", {
   id: serial("id").primaryKey(),
@@ -419,6 +439,11 @@ export const profilesRelations = relations(profiles, ({ one }) => ({
 export const icd11CategoriesRelations = relations(icd11Categories, ({ one, many }) => ({
   parent: one(icd11Categories, { fields: [icd11Categories.parent_id], references: [icd11Categories.id] }),
   children: many(icd11Categories, { relationName: "children" }),
+  pricingRules: many(icd11PricingRules),
+}));
+
+export const icd11PricingRulesRelations = relations(icd11PricingRules, ({ one }) => ({
+  category: one(icd11Categories, { fields: [icd11PricingRules.icd11_code], references: [icd11Categories.code] }),
 }));
 
 export const servicesRelations = relations(services, ({ one, many }) => ({

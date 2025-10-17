@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,12 @@ export default function ProfilePage() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
+  useEffect(() => {
+    if (!session && !isPending) {
+      router.push("/");
+    }
+  }, [session, isPending, router]);
+
   if (isPending) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -22,7 +29,6 @@ export default function ProfilePage() {
   }
 
   if (!session) {
-    router.push("/");
     return null;
   }
 

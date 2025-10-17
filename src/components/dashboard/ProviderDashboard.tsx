@@ -16,7 +16,9 @@ import {
   BarChart3,
   Star,
   Eye,
-  Users
+  Users,
+  Stethoscope,
+  PieChart
 } from "lucide-react";
 import Link from "next/link";
 
@@ -37,9 +39,18 @@ interface ProviderDashboardData {
   serviceMetrics: Array<{
     service_id: number;
     service_name: string;
+    icd11_code?: string;
+    icd11_name?: string;
     views: number;
     purchases: number;
     rating: number;
+  }>;
+  icd11Analytics: Array<{
+    icd11_code: string;
+    category_name: string;
+    service_count: number;
+    total_sales: number;
+    transaction_count: number;
   }>;
 }
 
@@ -192,7 +203,15 @@ export function ProviderDashboard() {
               {data.serviceMetrics.slice(0, 5).map((metric) => (
                 <div key={metric.service_id} className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium">{metric.service_name}</p>
+                    <div>
+                      <p className="text-sm font-medium">{metric.service_name}</p>
+                      {metric.icd11_code && (
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Stethoscope className="h-3 w-3" />
+                          {metric.icd11_code} - {metric.icd11_name}
+                        </p>
+                      )}
+                    </div>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Eye className="h-3 w-3" />
@@ -218,6 +237,40 @@ export function ProviderDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* ICD11 Analytics */}
+      {data.icd11Analytics && data.icd11Analytics.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <PieChart className="h-5 w-5" />
+              ICD11 Category Analytics
+            </CardTitle>
+            <CardDescription>Revenue breakdown by medical classification</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {data.icd11Analytics.slice(0, 5).map((category) => (
+                <div key={category.icd11_code} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <Stethoscope className="h-4 w-4 text-blue-600" />
+                    <div>
+                      <p className="text-sm font-medium">{category.category_name}</p>
+                      <p className="text-xs text-muted-foreground">{category.icd11_code}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">${category.total_sales?.toFixed(2) || '0.00'}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {category.service_count} services • {category.transaction_count} transactions
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Actions */}
       <Card>

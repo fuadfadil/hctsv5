@@ -74,8 +74,15 @@ export function ServiceCreator({ providerId, onSuccess }: ServiceCreatorProps = 
   };
 
   const nextStep = () => {
+    // Validation for step 1 - require ICD11 code
+    if (currentStep === 1 && !selectedCategory) {
+      setError("Please select an ICD11 classification before proceeding.");
+      return;
+    }
+
     if (currentStep < STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
+      setError(null); // Clear any previous errors
     }
   };
 
@@ -200,7 +207,7 @@ export function ServiceCreator({ providerId, onSuccess }: ServiceCreatorProps = 
             </div>
 
             <div>
-              <Label>ICD11 Classification</Label>
+              <Label>ICD11 Classification <span className="text-red-500">*</span></Label>
               <ICD11Browser
                 onSelectCategory={handleCategorySelect}
                 selectedCategories={selectedCategory ? [selectedCategory] : []}
@@ -212,6 +219,11 @@ export function ServiceCreator({ providerId, onSuccess }: ServiceCreatorProps = 
                     Selected: {selectedCategory.code} - {selectedCategory.name}
                   </Badge>
                 </div>
+              )}
+              {!selectedCategory && (
+                <p className="text-sm text-red-600 mt-1">
+                  ICD11 classification is required for service creation
+                </p>
               )}
             </div>
           </div>

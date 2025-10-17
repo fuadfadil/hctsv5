@@ -16,7 +16,8 @@ import {
   Download,
   Eye,
   DollarSign,
-  Package
+  Package,
+  BarChart3
 } from "lucide-react";
 import Link from "next/link";
 
@@ -313,6 +314,24 @@ export function InsuranceDashboard() {
                 <div className="flex flex-col items-center gap-2">
                   <TrendingUp className="h-6 w-6" />
                   <span>Spending Analytics</span>
+                </div>
+              </Link>
+            </Button>
+
+            <Button variant="outline" asChild className="h-auto p-4">
+              <Link href="/dashboard/certificates">
+                <div className="flex flex-col items-center gap-2">
+                  <Eye className="h-6 w-6" />
+                  <span>View Certificates</span>
+                </div>
+              </Link>
+            </Button>
+
+            <Button variant="outline" asChild className="h-auto p-4">
+              <Link href="/dashboard/insurance">
+                <div className="flex flex-col items-center gap-2">
+                  <BarChart3 className="h-6 w-6" />
+                  <span>Reports</span>
                 </div>
               </Link>
             </Button>

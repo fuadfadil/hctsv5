@@ -15,7 +15,8 @@ import {
   Info,
   Building,
   Tag,
-  DollarSign
+  DollarSign,
+  Stethoscope
 } from "lucide-react";
 
 interface Service {
@@ -23,6 +24,7 @@ interface Service {
   name: string;
   description: string;
   icd11_code: string;
+  icd11_name?: string;
   service_type: "individual" | "package" | "composite";
   base_price: number;
   discount_tiers: any;
@@ -110,7 +112,11 @@ export function ServiceCard({ service, viewMode, onAddToCart }: ServiceCardProps
               <Badge className={getServiceTypeColor(service.service_type)}>
                 {service.service_type}
               </Badge>
-              <Badge variant="outline">{service.icd11_code}</Badge>
+              <Badge variant="outline" className="flex items-center gap-1">
+                <Stethoscope className="h-3 w-3" />
+                {service.icd11_code}
+                {service.icd11_name && ` - ${service.icd11_name}`}
+              </Badge>
             </div>
             <p className="text-muted-foreground mb-2 line-clamp-2">
               {service.description}
@@ -201,7 +207,10 @@ export function ServiceCard({ service, viewMode, onAddToCart }: ServiceCardProps
               <Badge className={getServiceTypeColor(service.service_type)}>
                 {service.service_type}
               </Badge>
-              <Badge variant="outline">{service.icd11_code}</Badge>
+              <Badge variant="outline" className="flex items-center gap-1">
+                <Stethoscope className="h-3 w-3" />
+                {service.icd11_code}
+              </Badge>
             </div>
           </div>
         </div>
@@ -308,8 +317,14 @@ function ServiceDetails({ service }: { service: Service }) {
         </div>
 
         <div>
-          <h4 className="font-medium mb-2">ICD-11 Code</h4>
-          <Badge variant="outline">{service.icd11_code}</Badge>
+          <h4 className="font-medium mb-2">ICD-11 Classification</h4>
+          <div className="flex items-center gap-2">
+            <Stethoscope className="h-4 w-4 text-blue-600" />
+            <Badge variant="outline">{service.icd11_code}</Badge>
+            {service.icd11_name && (
+              <span className="text-sm text-muted-foreground">{service.icd11_name}</span>
+            )}
+          </div>
         </div>
 
         <div>

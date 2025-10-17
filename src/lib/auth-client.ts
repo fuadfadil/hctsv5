@@ -4,7 +4,7 @@ export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_APP_URL!,
   fetchOptions: {
     onRequest: (context) => {
-      console.log("[AuthClient] Making request:", context.url);
+      console.log("[AuthClient] Making request:", context.url, "Method:", context.method);
     },
     onResponse: (context) => {
       console.log("[AuthClient] Response received:", context.response?.status);

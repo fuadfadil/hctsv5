@@ -184,6 +184,26 @@ export class HealthcareToast {
 
     this.error('service', { description }, context)
   }
+
+  // Masart-specific payment toasts
+  static masartPaymentSuccess(amount: string, context?: HealthcareErrorContext) {
+    this.success("Payment completed with Masart", {
+      description: `Successfully processed payment of ${amount} for transaction #${context?.transactionId} via Masart gateway.`,
+    })
+  }
+
+  static masartPaymentPending(amount: string, context?: HealthcareErrorContext) {
+    this.info("Payment initiated with Masart", {
+      description: `Payment of ${amount} for transaction #${context?.transactionId} is being processed by Masart. You will be notified once completed.`,
+    })
+  }
+
+  static masartWebhookError(context?: HealthcareErrorContext) {
+    this.error('payment', {
+      title: "Masart Webhook Error",
+      description: "Failed to process payment notification from Masart.",
+    }, context)
+  }
 }
 
 // Export toast function for direct use

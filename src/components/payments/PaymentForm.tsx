@@ -19,6 +19,7 @@ interface PaymentFormProps {
 }
 
 const paymentMethods = [
+  { value: "masart", label: "Masart" },
   { value: "onepay", label: "OnePay" },
   { value: "lypay", label: "LyPay" },
   { value: "credit_card", label: "Credit/Debit Card" },
@@ -60,9 +61,15 @@ export function PaymentForm({ amount, transactionId, onPaymentInitiate, onPaymen
       };
 
       await onPaymentInitiate(paymentData);
-      HealthcareToast.success("Payment initiated successfully", {
-        description: `Payment of $${amount.toFixed(2)} has been initiated.`
-      });
+      if (selectedMethod === "masart") {
+        HealthcareToast.masartPaymentPending(`$${amount.toFixed(2)}`, {
+          transactionId,
+        });
+      } else {
+        HealthcareToast.success("Payment initiated successfully", {
+          description: `Payment of $${amount.toFixed(2)} has been initiated.`
+        });
+      }
     } catch (error) {
       console.error("Payment initiation failed:", error);
       HealthcareToast.paymentError(`$${amount.toFixed(2)}`, {
@@ -84,9 +91,15 @@ export function PaymentForm({ amount, transactionId, onPaymentInitiate, onPaymen
       };
 
       await onPaymentProcess(paymentData);
-      HealthcareToast.success("Payment processed successfully", {
-        description: `Payment of $${amount.toFixed(2)} has been completed.`
-      });
+      if (selectedMethod === "masart") {
+        HealthcareToast.masartPaymentSuccess(`$${amount.toFixed(2)}`, {
+          transactionId,
+        });
+      } else {
+        HealthcareToast.success("Payment processed successfully", {
+          description: `Payment of $${amount.toFixed(2)} has been completed.`
+        });
+      }
     } catch (error) {
       console.error("Payment processing failed:", error);
       HealthcareToast.paymentError(`$${amount.toFixed(2)}`, {
@@ -163,6 +176,18 @@ export function PaymentForm({ amount, transactionId, onPaymentInitiate, onPaymen
             <p className="text-sm text-muted-foreground">
               After completing the transfer, click "Process Payment" to confirm.
             </p>
+          </div>
+        );
+
+      case "masart":
+        return (
+          <div className="space-y-4">
+            <div className="p-4 bg-muted rounded-lg">
+              <h4 className="font-semibold mb-2">Secure Payment with Masart</h4>
+              <p className="text-sm text-muted-foreground">
+                You will be redirected to Masart's secure payment portal to complete your transaction.
+              </p>
+            </div>
           </div>
         );
 

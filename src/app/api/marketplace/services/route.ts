@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { services, users, profiles } from "@/lib/schema";
+import { services, users, profiles, icd11Categories } from "@/lib/schema";
 import { eq, and, like, gte, lte, desc, asc, sql } from "drizzle-orm";
 
 export async function GET(request: NextRequest) {
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       whereConditions.push(
-        sql`(${services.name} ILIKE ${`%${search}%`} OR ${services.description} ILIKE ${`%${search}%`})`
+        sql`(${services.name} ILIKE ${`%${search}%`} OR ${services.description} ILIKE ${`%${search}%`} OR ${services.icd11_code} ILIKE ${`%${search}%`} OR ${icd11Categories.name} ILIKE ${`%${search}%`})`
       );
     }
 
@@ -75,17 +75,19 @@ export async function GET(request: NextRequest) {
     const totalCountResult = await db
       .select({ count: sql<number>`count(*)` })
       .from(services)
+      .leftJoin(icd11Categories, eq(services.icd11_code, icd11Categories.code))
       .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
 
     const totalCount = totalCountResult[0]?.count || 0;
 
-    // Get services with provider information
+    // Get services with provider information and ICD11 category names
     const servicesList = await db
       .select({
         id: services.id,
         name: services.name,
         description: services.description,
         icd11_code: services.icd11_code,
+        icd11_name: icd11Categories.name,
         service_type: services.service_type,
         base_price: services.base_price,
         discount_tiers: services.discount_tiers,
@@ -101,6 +103,7 @@ export async function GET(request: NextRequest) {
       .from(services)
       .leftJoin(users, eq(services.provider_id, users.id))
       .leftJoin(profiles, eq(users.id, profiles.user_id))
+      .leftJoin(icd11Categories, eq(services.icd11_code, icd11Categories.code))
       .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
       .orderBy(orderBy(orderColumn))
       .limit(limit)
