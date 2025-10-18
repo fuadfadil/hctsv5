@@ -26,7 +26,12 @@ export function useUserRole() {
         }
 
         console.log("[useUserRole] Fetching role from API for user:", session.data.user.id);
-        const response = await fetch("/api/user/role");
+        const response = await fetch("/api/user/role", {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         console.log("[useUserRole] API response status:", response.status);
 
         if (!response.ok) {

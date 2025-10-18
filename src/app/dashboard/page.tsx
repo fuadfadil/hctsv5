@@ -10,13 +10,20 @@ import { ProviderDashboard } from "@/components/dashboard/ProviderDashboard";
 import { InsuranceDashboard } from "@/components/dashboard/InsuranceDashboard";
 import { IntermediaryDashboard } from "@/components/dashboard/IntermediaryDashboard";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamically import components that use auth hooks to avoid SSR issues
 const DynamicUserProfile = dynamic(() => import("@/components/auth/user-profile"), { ssr: false });
 
 export default function DashboardPage() {
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure hooks only run on client-side after hydration
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const { data: session, isPending } = useSession();
   const { role: userRole, loading: roleLoading } = useUserRole();
   const router = useRouter();
@@ -28,7 +35,8 @@ export default function DashboardPage() {
     }
   }, [userRole, roleLoading, session, router]);
 
-  if (isPending || roleLoading) {
+  // Show loading state until client-side hydration completes
+  if (!isClient || isPending || roleLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         Loading...

@@ -22,31 +22,56 @@ export function SignInButton() {
 
     setIsSigningIn(true);
     console.log("[SignInButton] Starting Google sign-in process");
+    console.log("[SignInButton] Current window location:", window.location.href);
+    console.log("[SignInButton] Callback URL being used:", "/dashboard");
+    console.log("[SignInButton] Client base URL:", process.env.NEXT_PUBLIC_APP_URL);
 
     try {
       console.log("[SignInButton] Calling signIn.social with Google provider");
+      console.log("[SignInButton] Sign-in parameters:", {
+        provider: "google",
+        callbackURL: "/dashboard",
+        baseURL: process.env.NEXT_PUBLIC_APP_URL,
+      });
+
       const result = await signIn.social({
         provider: "google",
         callbackURL: "/dashboard",
       });
 
       console.log("[SignInButton] Sign-in result:", result);
+      console.log("[SignInButton] Result properties:", Object.keys(result || {}));
+      console.log("[SignInButton] Result data:", result?.data);
+      console.log("[SignInButton] Result redirect:", result?.data?.redirect);
+      console.log("[SignInButton] Result url:", result?.data?.url);
 
       if (result?.error) {
         console.error("[SignInButton] Sign-in returned error:", result.error);
         throw new Error(result.error.message || "Sign-in failed");
       }
 
-      if (result?.url) {
-        console.log("[SignInButton] Redirecting to:", result.url);
-        window.location.href = result.url;
+      if (result?.data?.url) {
+        console.log("[SignInButton] Redirecting to:", result.data.url);
+        window.location.href = result.data.url;
         return;
+      }
+
+      if (result?.data?.redirect) {
+        console.log("[SignInButton] Redirect flag is true, but no URL provided");
       }
 
       // If no URL is returned, the sign-in might have succeeded directly
       console.log("[SignInButton] Sign-in completed without redirect");
     } catch (error: any) {
       console.error("[SignInButton] Sign-in error:", error);
+      console.error("[SignInButton] Full error details:", {
+        message: error?.message,
+        code: error?.code,
+        stack: error?.stack,
+        name: error?.name,
+        response: error?.response?.data,
+        status: error?.response?.status,
+      });
 
       // Categorize and handle different error types
       if (error?.message?.includes("network") || error?.code === "NETWORK_ERROR") {

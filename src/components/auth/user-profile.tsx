@@ -15,7 +15,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { User, LogOut } from "lucide-react";
 
-export default function UserProfile() {
+function UserProfileComponent() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
@@ -87,3 +87,6 @@ export default function UserProfile() {
     </DropdownMenu>
   );
 }
+
+export default UserProfileComponent;
+export const UserProfile = UserProfileComponent;
